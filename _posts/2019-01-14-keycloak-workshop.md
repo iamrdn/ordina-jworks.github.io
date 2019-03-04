@@ -8,19 +8,36 @@ category: Workshop
 comments: true
 ---
 
-//Table of contents
+# Table of contents
+
+1. [Intro](#intro)
+2. [Setting up our project](#setting-up-our-project)
+3. [Setting up Keycloak](#keycloak)
+4. [Front-End setup](#front-end)
+5. [Back-End setup](#back-end)
+
 
 # Intro
 
-Everyone who writes software (for a living) has implemented a way to identify and authenticate users. Either in the application itself or via an Identity management platform or IDP for short. 
+Everyone who has written software from novice to professional has to deal with user authentication and authorisation at some point. Either implemented it themselves or handle the requests via an Identity Management Platform or IDP for short. 
 
-Today, you can find several platforms that handle user login requests. Like Keycloak, OKTA, OpenAM , ... etc. All those platforms have their own features and possibilities that may be useful for your usecase. 
+Today, you can find several platforms that handles user login requests. Like Keycloak, OKTA, OpenAM , ... etc. All those platforms have their own features and possibilities that may be useful for your usecase. 
 
-In this blog post, we'll focus on [Keycloak](https://www.keycloak.org/). An open-source identity and access management platform (IAM) from Red Hat's [Jboss](http://www.jboss.org/). We have chosen for Keycloak because of it's well-compreshensive documentation and a lot of connectors to choose form.
+In this blog post, we will focus on [Keycloak](https://www.keycloak.org/). An open-source identity and access management platform (IAM) from Red Hat's [Jboss](http://www.jboss.org/). We have chosen for Keycloak because of it's well-compreshensive documentation and a lot of connectors to choose form.
 
-//Key features of keycloak
+Of course there's a lot you can configure with Keycloak and it's supported libraries for numerous programming languages and frameworks. We will cover just the basics to get you started.
 
-...
+Keycloak comes with several handy features build-in like:
+
+- Two-factor authentication
+- Bruteforce detection
+- Social login (Facebook, Twitter , Google , … )
+- LDAP/AD integration 
+- … And much more
+
+
+
+In the following example, we will implement security in a forum application. When you clone and run the project, you will notice that you can do everything on the forum. Even when you're not authenticated. 
 
 # setting up our project
 
