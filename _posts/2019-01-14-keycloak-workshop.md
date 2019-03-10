@@ -19,11 +19,11 @@ comments: true
 
 # Intro
 
-Everyone who has written software from novice to professional has to deal with user authentication and authorisation at some point. Either implemented it themselves or handle the requests via an Identity Management Platform or IDP for short. 
+Everyone who has written software as a novice or professional has to deal with user authentication and authorisation at some point. Either implemented it themselves or handle the requests via an Identity Management Platform or IDP for short. 
 
 Today, you can find several platforms that handles user login requests. Like Keycloak, OKTA, OpenAM , ... etc. All those platforms have their own features and possibilities that may be useful for your usecase. 
 
-In this blog post, we will focus on [Keycloak](https://www.keycloak.org/). An open-source identity and access management platform (IAM) from Red Hat's [Jboss](http://www.jboss.org/). We have chosen for Keycloak because of it's well-compreshensive documentation and a lot of connectors to choose form.
+In this blog post, we will focus on [Keycloak](https://www.keycloak.org/). An open-source identity and access management platform (IAM) from Red Hat's [Jboss](http://www.jboss.org/). We have chosen for Keycloak because of it's well-compreshensive documentation and it's availability of connectors to choose form.
 
 Of course there's a lot you can configure with Keycloak and it's supported libraries for numerous programming languages and frameworks. We will cover just the basics to get you started.
 
@@ -56,7 +56,14 @@ cd keycloak-4.8.3.Final/bin/
 
 ## Front-end
 
-Let's begin with an initial project to start with. Check out `<url>`
+Let's begin with an initial project to start with. Check out 
+```bash
+ $ git clone https://github.com/lenn3k/ngx-broken-blog
+ $ npm install
+ $ ng serve
+```
+
+
  With no security implemented. Now everyone can for example post or edit forum posts in our application.
 
 
