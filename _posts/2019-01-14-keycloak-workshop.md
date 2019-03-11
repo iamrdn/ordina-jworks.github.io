@@ -21,7 +21,7 @@ comments: true
 
 Everyone who has written software as a novice or professional has to deal with user authentication and authorization at some point. Either implemented it themselves or handle the requests via an Identity Management Platform or IDP for short. Today, you can find several platforms that handles user login requests. Like Keycloak, OKTA, OpenAM , ... etc. All those platforms have their own features and possibilities that may be useful for your use case. 
 
-In this blog post, we will focus on [Keycloak](https://www.keycloak.org/). An open-source identity and access management platform (IAM) from Red Hat's [Jboss](http://www.jboss.org/). We have chosen for Keycloak because of it's well-comprehensive documentation and it's availability of connectors to choose form. Of course there's a lot you can configure with Keycloak and it's supported libraries for numerous programming languages and frameworks. We will cover just the basics to get you started.
+In this blog post, we will focus on [Keycloak](https://www.keycloak.org/). An open-source identity and access management platform (IAM) from Red Hat's [Jboss](http://www.jboss.org/). We have chosen for Keycloak because of it's well-comprehensive documentation and it's availability of connectors to choose form. Of course there's a lot you can configure with Keycloak and it's supported libraries for numerous programming languages and frameworks. We will cover just the basics just to get you started.
 
 Keycloak comes with several handy features build-in like:
 
@@ -61,15 +61,9 @@ Let's begin with an initial project to start with. Check out the repository and 
 
 You can now point your browser to `http://localhost:4200` With no security implemented. Everyone can post or edit forum posts in our application.
 
-There are several libraries that could work with KeyCloak. It is wise to choose a library that is actively maintained and well-implemented. The OpenID Foundation has a [list](https://openid.net/certification/) of certified OpenID libraries.
+There are several libraries that could work with KeyCloak. It is wise to choose a library that is actively maintained and well-implemented. The OpenID Foundation has a [list](https://openid.net/certification/) of certified OpenID libraries. We will use Manfred Steyers's [Angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc) library for our front-end.
 
-We will use Manfred Steyers's [Angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc) library for our front-end.
-
-In the front-end, import the Angular-oauth2-oidc into our project with:
-
-`$ npm install angular-oauth2-oidc`
-
-After the installation is finished, let's implement the `OauthModule` into `App.module.ts` and `App.components.ts` respectively to begin with.
+In the front-end, import the Angular-oauth2-oidc into our project with: `$ npm install angular-oauth2-oidc` After the installation is finished, let's implement the `OauthModule` into `App.module.ts` and `App.components.ts` respectively to begin with.
 
 **App.module.ts**
 
@@ -103,7 +97,7 @@ constructor(private oauthService: OAuthService) {
 ...
 ```
 
-Next create a config file where we specify our KeyCloak realm and clientId
+Next create a config file where we specify our KeyCloak realm and ClientId
 
 **Auth-password.config.ts**
 
@@ -119,6 +113,33 @@ export const authPasswordFlowConfig: AuthConfig = {
   showDebugInformation: true,
   oidc: false
 };
+```
+
+
+
+With the provided library, it's possible to either redirect to KeyCloak's login page or handle our login request directly. Which is possible via `authPasswordFlowConfig`
+
+**Login-page.component.ts** (in constructor)
+
+```typescript
+this.oAuthService.configure(authPasswordFlowConfig);
+this.oAuthService.loadDiscoveryDocument();
+```
+
+The last statement will fetch the Discovery document from KeyCloak. A Discovery document is a JSON document that contains the configuration of the OAuth provider. Including URI's of the authorization, token , userinfo and public-key endpoints. It can be retrieved from `http://localhost:9080/auth/realms/brokenblog/.well-known/openid-configuration` .
+
+After a successful login, we want to go back to the home screen
+
+**Login-page.component.ts**
+
+```typescript
+...
+
+this.oAuthService.fetchTokenUsingPasswordFlowAndLoadUserProfile(username, password)
+        .then(value => {
+          this.router.navigate(['/']);
+        })
+...        
 ```
 
 
