@@ -3,7 +3,7 @@ layout: post
 authors: [jeroen_meys, johan_silkens]
 title: 'Keycloak workshop'
 image: /img/keycloak/logo.png
-tags: [Spring,Angular,Keycloak]
+tags: [Spring,Spring Boot,Angular,Keycloak]
 category: Workshop
 comments: true
 ---
@@ -23,13 +23,13 @@ Everyone who has written software as a novice or professional has to deal with u
 
 In this blog post, we will focus on [Keycloak](https://www.keycloak.org/). An open-source identity and access management platform (IAM) from Red Hat's [Jboss](http://www.jboss.org/). We have chosen for Keycloak because of it's well-comprehensive documentation and it's availability of connectors to choose form. Of course there's a lot you can configure with Keycloak and it's supported libraries for numerous programming languages and frameworks. We will cover just the basics just to get you started.
 
-Keycloak comes with several handy features build-in like:
+Keycloak comes with several handy features build-in:
 
 - Two-factor authentication
 - Bruteforce detection
 - Social login (Facebook, Twitter , Google , … )
 - LDAP/AD integration 
-- … And much more
+- … And many more
 
 
 
@@ -48,11 +48,15 @@ $ cd keycloak-4.8.3.Final/bin/
 $ ./standalone
 ```
 
+> For Windows users, there is also a `standalone.bat` in the same folder.
+
+
 ## Keycloak
 
 ## Front-end
 
-Let's begin with an initial project to start with. Check out the repository and do the regular `npm` commands to install the necessary dependencies and run the project 
+Let's begin with an initial project to start with. Check out the repository and do the regular `npm` commands to install the necessary dependencies and run the project  
+
 ```bash
  $ git clone https://github.com/lenn3k/ngx-broken-blog
  $ npm install
@@ -239,7 +243,7 @@ Let's post again using our token:
 
 ```shell
 $# POST something to /api/v1/ -> should be for users only
-$curl -i -X POST -H "Authorization: bearer $TOKEN" http://localhost:8080/api/v1/topics
+$curl -i -X POST -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/topics
 HTTP/1.1 200 
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
@@ -389,7 +393,7 @@ Notice how we don't get redirected (HTTP 302) like before but immediately get a 
 Let's add our bearer token again:
 
 ```shell
-$curl -i -X GET -H "Authorization: bearer $TOKEN" http://localhost:8080/api/v1/topics
+$curl -i -X GET -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/topics
 HTTP/1.1 401 
 WWW-Authenticate: Bearer realm="brokenblog", error="invalid_token", error_description="Token is not active"
 X-Content-Type-Options: nosniff
@@ -409,7 +413,7 @@ At the moment of writing, I still have to figure out why this is happening. All 
 Anyway, after obtaining a new token, we try again:
 
 ```shell
-$curl -i -H "Authorization: bearer $TOKEN" http://localhost:8080/api/v1/topics
+$curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/topics
 HTTP/1.1 200 
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
@@ -424,11 +428,60 @@ Date: Thu, 21 Mar 2019 21:28:51 GMT
 []
 ```
 
-We can now use all the added benefits of Spring Security!
+We can now use all the added benefits of Spring Security.  
+
+# Adapterless  
+Since Keycloak utilises the OpenIdConnect protocol, we can also protect our Spring Boot application with Spring Security alone.  
+Let's say we want to use our application for token verification only. This is called an oauth2 resource server and is really easy to set up.  
+The dependencies are:  
+
+```gradle
+dependencies {
+    implementation 'org.springframework.security:spring-security-config'
+   	implementation 'org.springframework.security:spring-security-oauth2-jose'
+ 	implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+
+}
+```
+
+The JOSE dependecy stands for JavaScript Object Signing and Encryption.  
+We use it to decode our tokens via its [JwtDecoder](https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/oauth2/jwt/JwtDecoder.html).
+`application.properties` Can be cleared with only one new entry to add. We have to specfy how the checksum in the token has to be verified.
+We can find this url in the well-known configuration URL mentioned earlier.  
+
+```properties
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost:9080/auth/realms/brokenblog/protocol/openid-connect/certs
+```
+
+All there is left to do is to configure our WebSecurityConfigurerAdapter once again.
+This time we configure it to be an Oauth2 resource server:  
+
+```java
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@EnableWebSecurity
+public class OAuth2ResourceServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                    .antMatchers("/api/v1/*").authenticated()
+                    .and()
+                .oauth2ResourceServer()
+                    .jwt();
+    }
+}
+```
+Fun-fact: be sure to write 'Bearer' in the Authorization header with a capital letter 'B'. Failing to do so, will return HTTP 401 with the message: Bearer.  
+This is the correct way but our previous examples were more tolerant towards the spelling.
 
 # Conclusion
 
-## 
-
-
-
+You now now how easy it is to setup a Keycloak server and define clients, showing the potential of an IDP.
+We have seen how Keycloak can help us to ease the implementation of authenticating in our code.  
+We then used Spring Security to help us with more fine-grained authorization of our resources.  
+This makes it more enjoyable to integrate security without risking common pitfalls by doing it ourselves.
