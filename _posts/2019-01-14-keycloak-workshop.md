@@ -63,9 +63,9 @@ Let's begin with an initial project to start with. Check out the repository and 
  $ npm run start
 ```
 
-You can now point your browser to `http://localhost:4200` With no security implemented. Everyone can post or edit forum posts in our application.
+You can now point your browser to `http://localhost:4200` .The initial project has no security implemented so everyone can post or edit forum posts in our application.
 
-There are several libraries that could work with KeyCloak. It is wise to choose a library that is actively maintained and well-implemented. The OpenID Foundation has a [list](https://openid.net/certification/) of certified OpenID libraries. We will use Manfred Steyers's [Angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc) library for our front-end.
+There are several libraries that could work with KeyCloak. It is wise to choose a library that is actively maintained and well-implemented. OpenID Foundation has a [list](https://openid.net/certification/) of certified OpenID libraries. In this project, We will use Manfred Steyers's [Angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc) library for our front-end.
 
 In the front-end, import the Angular-oauth2-oidc into our project with: `$ npm install angular-oauth2-oidc` After the installation is finished, let's implement the `OAuthModule` into `App.module.ts` and `App.components.ts` respectively to begin with.
 
@@ -121,7 +121,7 @@ export const authPasswordFlowConfig: AuthConfig = {
 
 
 
-With the provided library, it's possible to either redirect to KeyCloak's login page or handle our login request directly. Which is possible via `authPasswordFlowConfig`
+With the provided library, it's possible to either redirect to KeyCloak's login page, or handle our login request directly. Which is possible via `authPasswordFlowConfig`
 
 **Login-page.component.ts** (in constructor)
 
